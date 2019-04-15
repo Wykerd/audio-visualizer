@@ -5,7 +5,7 @@ class AudioVisualizer {
      * 
      * @param {string} audio 
      * @param {string} canvas 
-     * @param {object} style 
+     * @param {*} style 
      */
     constructor(audio, canvas, style = {}) {
         this.audioElement = document.querySelector(audio);
@@ -24,6 +24,7 @@ class AudioVisualizer {
             // Add fallback
             this.audioContext = {};
             this.audioContext.resume = ()=>new Promise(resolve=>resolve()); 
+            this.sineWaveOffset = 0;
         }
         this.canvas = document.querySelector(canvas);
         this.ctx = this.canvas.getContext('2d');
@@ -92,8 +93,8 @@ class AudioVisualizer {
     }
 
     draw () {
+        requestAnimationFrame((...params)=>this.draw(...params));
         if (this.analyser) {
-            requestAnimationFrame((...params)=>this.draw(...params));
             this.analyser.getByteTimeDomainData(this.dataArray);
             this.ctx.fillStyle = this.style.back;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -119,11 +120,35 @@ class AudioVisualizer {
 
             this.ctx.lineTo(this.canvas.width, this.canvas.height/2);
             this.ctx.stroke();
+        } else if (!this.audioElement.paused) {
+            this.sineWaveOffset--;
+            this.ctx.fillStyle = this.style.back;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = this.style.progress;
+            this.ctx.fillRect(0, 0, Math.floor(this.canvas.width *(this.audioElement.currentTime / this.audioElement.duration)), this.canvas.height);
+            this.ctx.strokeStyle = this.style.line;
+            this.ctx.lineWidth = this.style.lineWidth;
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, this.canvas.height / 2);
+            const modifier = Math.floor(Math.random()*Math.random()*((this.canvas.height / 2)))
+            for (let i = 0; i < this.canvas.width; i++) {
+                this.ctx.lineTo(i * 10, 
+                    (Math.sin((Math.floor(this.sineWaveOffset / Math.floor(Math.random() * 2)) + i) * (180 / Math.PI)) * ((this.canvas.height / 2) - (this.canvas.height / 8) - modifier)) + (this.canvas.height / 2)) ;
+            }
+            this.ctx.stroke();
+        } else {
+            this.ctx.fillStyle = this.style.back;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.strokeStyle = this.style.line;
+            this.ctx.lineWidth = this.style.lineWidth;
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, this.canvas.height / 2);
+            this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+            this.ctx.stroke();
         }
     }
 
     play() {
         this.audioElement.play();
-        this.draw();
     }
 }

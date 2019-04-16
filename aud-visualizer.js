@@ -20,7 +20,7 @@ class AudioVisualizer {
             this.dataArray = new Uint8Array(this.bufferLength);
             this.analyser.getByteTimeDomainData(this.dataArray);
         } catch (error) {
-            console.log('Outdated browser, cannot visualize!');
+            console.warn('Outdated browser, cannot visualize! Using random generator');
             // Add fallback
             this.audioContext = {};
             this.audioContext.resume = ()=>new Promise(resolve=>resolve()); 
@@ -93,7 +93,7 @@ class AudioVisualizer {
     }
 
     draw () {
-        requestAnimationFrame((...params)=>this.draw(...params));
+        window.requestAnimationFrame((...params)=>this.draw(...params));
         if (this.analyser) {
             this.analyser.getByteTimeDomainData(this.dataArray);
             this.ctx.fillStyle = this.style.back;
@@ -131,8 +131,9 @@ class AudioVisualizer {
             this.ctx.beginPath();
             this.ctx.moveTo(0, this.canvas.height / 2);
             const modifier = Math.floor(Math.random()*Math.random()*((this.canvas.height / 2)))
+            const randomLength = 10 + Math.floor((Math.random() * 20));
             for (let i = 0; i < this.canvas.width; i++) {
-                this.ctx.lineTo(i * 10, 
+                this.ctx.lineTo(i * randomLength, 
                     (Math.sin((Math.floor(this.sineWaveOffset / Math.floor(Math.random() * 2)) + i) * (180 / Math.PI)) * ((this.canvas.height / 2) - (this.canvas.height / 8) - modifier)) + (this.canvas.height / 2)) ;
             }
             this.ctx.stroke();

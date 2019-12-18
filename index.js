@@ -1,14 +1,14 @@
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
-class AudioVisualizer {
+module.exports = class AudioVisualizer {
     /**
      * 
-     * @param {string} audio 
-     * @param {string} canvas 
+     * @param {HTMLAudioElement} audio 
+     * @param {HTMLCanvasElement} canvas 
      * @param {*} style 
      */
     constructor(audio, canvas, style = {}) {
-        this.audioElement = document.querySelector(audio);
+        this.audioElement = audio;
         try {
             this.audioContext = new AudioContext();
             this.analyser = this.audioContext.createAnalyser();
@@ -20,13 +20,14 @@ class AudioVisualizer {
             this.dataArray = new Uint8Array(this.bufferLength);
             this.analyser.getByteTimeDomainData(this.dataArray);
         } catch (error) {
+            console.error(error);
             console.warn('Outdated browser, cannot visualize! Using random generator');
             // Add fallback
             this.audioContext = {};
             this.audioContext.resume = ()=>new Promise(resolve=>resolve()); 
             this.sineWaveOffset = 0;
         }
-        this.canvas = document.querySelector(canvas);
+        this.canvas = canvas;
         this.ctx = this.canvas.getContext('2d');
         
         this.style = {};
@@ -69,9 +70,7 @@ class AudioVisualizer {
         }
 
         this.canvas.addEventListener("mousedown", e=>this.clickHandler(true, e))
-
         this.canvas.addEventListener("mouseup", e=>this.clickHandler(false, e));
-
         this.canvas.addEventListener("mouseleave", e=>this.clickHandler(false, e));
 
         this.init();
@@ -89,7 +88,7 @@ class AudioVisualizer {
     }
 
     pause () {
-        this.audioElement.pause();
+        return this.audioElement.pause();
     }
 
     draw () {
@@ -150,6 +149,6 @@ class AudioVisualizer {
     }
 
     play() {
-        this.audioElement.play();
+        return this.audioElement.play();
     }
 }

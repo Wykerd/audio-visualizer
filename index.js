@@ -1,6 +1,6 @@
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
-module.exports = class AudioVisualizer {
+class AudioVisualizer {
     /**
      * 
      * @param {HTMLAudioElement} audio 
@@ -152,3 +152,5 @@ module.exports = class AudioVisualizer {
         return this.audioElement.play();
     }
 }
+
+module.exports = AudioVisualizer;

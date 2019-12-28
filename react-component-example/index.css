@@ -1,0 +1,14 @@
+.react_audio {
+    display: flex;
+}
+
+.react_audio button {
+    min-width: 100px;
+    max-width: 100px;
+    border-radius: unset !important;
+}
+
+.react_audio canvas {
+    flex-grow: 1;
+    min-width: 0;
+}

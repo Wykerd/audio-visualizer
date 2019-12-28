@@ -2,10 +2,12 @@ const AudioContext = window.AudioContext || window.webkitAudioContext;
 
 class AudioVisualizer {
     /**
-     * 
-     * @param {HTMLAudioElement} audio 
-     * @param {HTMLCanvasElement} canvas 
-     * @param {*} style 
+     * Create the AudioVisualizer object
+     * @param {HTMLAudioElement} audio Audio element
+     * @param {HTMLCanvasElement} canvas Canvas to use to draw the visualizeation
+     * @param {*} style Override the default styles.
+     * @example
+     * new AudioVisualizer(document.querySelector('audio'), document.querySelector('canvas'));
      */
     constructor(audio, canvas, style = {}) {
         this.audioElement = audio;
@@ -44,26 +46,17 @@ class AudioVisualizer {
         this.canvas.addEventListener("mousemove", e=>this.mousemoveHandler(e));
         this.canvas.addEventListener("touchmove", e=>this.touchmoveHandler(e));
 
-        /**
-         * @private
-         */
         this.touchmoveHandler = e=>{
             let x = e.touches[0].clientX - this.canvas.offsetLeft;
             this.audioElement.currentTime = Math.floor(this.audioElement.duration * (x / this.canvas.clientWidth));
         }
 
-        /**
-         * @private
-         */
         this.mousemoveHandler = function (e) {
             e.preventDefault();
             let x = e.clientX - this.canvas.offsetLeft;
             if (this.clicked) this.audioElement.currentTime = Math.floor(this.audioElement.duration * (x / this.canvas.clientWidth));
         }
 
-        /**
-         * @private
-         */
         this.clickHandler = (clicked, e)=>{
             this.clicked = clicked;
             this.mousemoveHandler(e);
@@ -76,6 +69,9 @@ class AudioVisualizer {
         this.init();
     }
 
+    /**
+     * @private
+     */
     init () {
         this.ctx.fillStyle = this.style.back;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -87,10 +83,16 @@ class AudioVisualizer {
         this.ctx.stroke();
     }
 
+    /**
+     * Trigger the pause method on the audio element linked to the visualizer
+     */
     pause () {
         return this.audioElement.pause();
     }
 
+    /**
+     * @private
+     */
     draw () {
         window.requestAnimationFrame((...params)=>this.draw(...params));
         if (this.analyser) {
@@ -148,6 +150,9 @@ class AudioVisualizer {
         }
     }
 
+    /**
+     * Trigger the play method of the audio element linked with the visualizer
+     */
     play() {
         return this.audioElement.play();
     }
